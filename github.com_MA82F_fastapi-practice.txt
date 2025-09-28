@@ -1,0 +1,1 @@
+https://github.com/MA82F/fastapi-practice
