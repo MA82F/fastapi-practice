@@ -14,3 +14,22 @@ class UpdateCostSchema(BaseModel):
 
 class CostResponseSchema(CostSchema):
     id: int = Field(..., description="The unique identifier of the cost item")
+    
+    class Config:
+        from_attributes = True  # For Pydantic v2 (or use orm_mode = True for v1)
+
+
+# User Schemas
+class UserSchema(BaseModel):
+    user_name: str = Field(..., min_length=1, max_length=150, description="The username")
+    password: str = Field(..., min_length=1, max_length=150, description="The user password")
+
+class CreateUserSchema(UserSchema):
+    pass
+
+class UserResponseSchema(BaseModel):
+    id: int = Field(..., description="The unique identifier of the user")
+    user_name: str = Field(..., description="The username")
+    
+    class Config:
+        from_attributes = True
