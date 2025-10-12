@@ -11,13 +11,16 @@ from auth.jwt_cookie_auth import (
     generate_access_token, generate_refresh_token, get_authenticated_user,
     set_secure_cookies, clear_auth_cookies, validate_refresh_token_from_cookie
 )
+from middleware import LanguageMiddleware
+from i18n import _
 
 app = FastAPI()
 
+app.add_middleware(LanguageMiddleware)
 
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
-    return {"message": "Hello World!"}
+    return {"message": _("Hello World!")}
 
 @app.post("/costs", response_model=CostResponseSchema, status_code=status.HTTP_201_CREATED)
 def create_cost(cost: CreateCostSchema, current_user: UserModel = Depends(get_authenticated_user), db: Session = Depends(get_db)):
@@ -39,11 +42,11 @@ def create_cost(cost: CreateCostSchema, current_user: UserModel = Depends(get_au
 def read_cost(cost_id: int, current_user: UserModel = Depends(get_authenticated_user), db: Session = Depends(get_db)):
     cost = db.query(CostModel).filter(CostModel.id == cost_id).first()
     if not cost:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Cost with id {cost_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_(f"Cost with id {cost_id} not found"))
     
     # Check if the cost belongs to the authenticated user
     if cost.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: This cost doesn't belong to you")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_("Access denied: This cost doesn't belong to you"))
     
     return cost
     
@@ -57,11 +60,11 @@ def read_costs(current_user: UserModel = Depends(get_authenticated_user), db: Se
 def update_cost(cost_id: int, updated_cost: UpdateCostSchema, current_user: UserModel = Depends(get_authenticated_user), db: Session = Depends(get_db)):
     cost = db.query(CostModel).filter(CostModel.id == cost_id).first()
     if not cost:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Cost with id {cost_id} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f_("Cost with id {cost_id} not found"))
     
     # Check if the cost belongs to the authenticated user
     if cost.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: This cost doesn't belong to you")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_("Access denied: This cost doesn't belong to you"))
     
     # Update only the fields that are provided
     if updated_cost.description is not None:
@@ -84,7 +87,7 @@ def delete_cost(cost_id: int, current_user: UserModel = Depends(get_authenticate
     
     # Check if the cost belongs to the authenticated user
     if cost.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: This cost doesn't belong to you")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_("Access denied: This cost doesn't belong to you"))
     
     db.delete(cost)
     db.commit()
@@ -99,7 +102,7 @@ def create_user(user: CreateUserSchema, response: Response, db: Session = Depend
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already exists"
+            detail=_("Username already exists")
         )
     
     db_user = UserModel(
@@ -118,7 +121,7 @@ def create_user(user: CreateUserSchema, response: Response, db: Session = Depend
     set_secure_cookies(response, access_token, refresh_token)
     
     return {
-        "detail": "signed up successfully",
+        "detail": _("signed up successfully"),
         "user": {
             "id": db_user.id,
             "user_name": db_user.user_name
@@ -132,14 +135,14 @@ def login_user(user: UserSchema, response: Response, db: Session = Depends(get_d
     if not db_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password"
+            detail=_("Invalid username or password")
         )
     
     # In a real application, you should hash passwords and compare hashed versions
     if db_user.password != user.password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password"
+            detail=_("Invalid username or password")
         )
     
     # Generate tokens
@@ -150,7 +153,7 @@ def login_user(user: UserSchema, response: Response, db: Session = Depends(get_d
     set_secure_cookies(response, access_token, refresh_token)
     
     return {
-        "detail": "logged in successfully",
+        "detail": _("logged in successfully"),
         "user": {
             "id": db_user.id,
             "user_name": db_user.user_name
@@ -169,7 +172,7 @@ def logout_user(response: Response, current_user: UserModel = Depends(get_authen
     # Clear authentication cookies
     clear_auth_cookies(response)
     
-    return {"detail": "Successfully logged out"}
+    return {"detail": _("Successfully logged out")}
 
 @app.post("/refresh-tokens", status_code=status.HTTP_200_OK)
 def refresh_access_token(response: Response, user_id: int = Depends(validate_refresh_token_from_cookie)):
@@ -184,7 +187,7 @@ def refresh_access_token(response: Response, user_id: int = Depends(validate_ref
     set_secure_cookies(response, new_access_token, new_refresh_token)
     
     return {
-        "detail": "Tokens refreshed successfully"
+        "detail": _("Tokens refreshed successfully")
     }
 
 @app.get("/auth/me", status_code=status.HTTP_200_OK)

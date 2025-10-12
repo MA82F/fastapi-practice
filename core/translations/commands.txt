@@ -1,0 +1,10 @@
+Extract messages where I added _ to .pot file:
+# pybabel extract -F pybabel.cfg -o translations/messages.pot . 
+_________________________________________________________________________________________
+
+Translation folder and files making:  //"en" or "fa" or "de" or...
+# pybabel init -i translations/messages.pot -d translations -l en
+_________________________________________________________________________________________
+
+Compile to use as .mo files
+pybabel compile -d translations
