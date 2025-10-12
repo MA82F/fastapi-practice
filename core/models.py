@@ -9,7 +9,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
 )
-from .database import Base
+from core.database import Base
 from sqlalchemy.orm import relationship
 
 

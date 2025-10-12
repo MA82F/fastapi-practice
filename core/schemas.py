@@ -26,13 +26,3 @@ class UserSchema(BaseModel):
 
 class CreateUserSchema(UserSchema):
     pass
-
-class RefreshTokenSchema(BaseModel):
-    refresh_token: str = Field(..., description="The refresh token")
-
-class UserResponseSchema(BaseModel):
-    id: int = Field(..., description="The unique identifier of the user")
-    user_name: str = Field(..., description="The username")
-    
-    class Config:
-        from_attributes = True

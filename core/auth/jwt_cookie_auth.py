@@ -1,15 +1,42 @@
-from fastapi import Depends, HTTPException, status, Request, Cookie
+from fastapi import Depends, HTTPException, Response, status, Cookie
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from ..models import UserModel
-from ..database import get_db
+from models import UserModel
+from core.database import get_db
 from sqlalchemy.orm import Session
 from datetime import datetime,timedelta
 from typing import Optional
 import jwt
 from jwt.exceptions import InvalidSignatureError, DecodeError
-from ..config import settings
+from core.config import settings
 
 security = HTTPBearer(auto_error=False)  # Don't auto error to allow cookie fallback
+
+def set_secure_cookies(response: Response, access_token: str, refresh_token: str):
+    """Set secure HTTP-only cookies for tokens"""
+    # Set access token cookie (5 minutes)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        max_age=60 * 5,  # 5 minutes
+        httponly=True,  # Prevent XSS attacks
+        secure=True,    # Only send over HTTPS in production
+        samesite="lax"  # CSRF protection
+    )
+    
+    # Set refresh token cookie (24 hours)
+    response.set_cookie(
+        key="refresh_token", 
+        value=refresh_token,
+        max_age=60 * 60 * 24,  # 24 hours
+        httponly=True,  # Prevent XSS attacks
+        secure=True,    # Only send over HTTPS in production
+        samesite="lax"  # CSRF protection
+    )
+
+def clear_auth_cookies(response: Response):
+    """Clear authentication cookies"""
+    response.delete_cookie(key="access_token", httponly=True, secure=True, samesite="lax")
+    response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite="lax")
 
 
 def get_authenticated_user(
