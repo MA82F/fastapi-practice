@@ -1,16 +1,16 @@
 from sqlalchemy import (
     Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
     String,
     Text,
-    Boolean,
     func,
-    Integer,
-    Float,
-    DateTime,
-    ForeignKey,
 )
-from core.database import Base
 from sqlalchemy.orm import relationship
+
+from core.database import Base
 
 
 class UserModel(Base):

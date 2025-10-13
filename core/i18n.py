@@ -1,6 +1,7 @@
 import gettext
 from pathlib import Path
 
+
 class TranslationWrapper:
     _instance = None
 
@@ -14,10 +15,7 @@ class TranslationWrapper:
         lang = "en"  # زبان پیش‌فرض
         locales_dir = Path(__file__).parent / "translations"
         self.translations = gettext.translation(
-            "messages",
-            localedir=locales_dir,
-            languages=[lang],
-            fallback=True
+            "messages", localedir=locales_dir, languages=[lang], fallback=True
         )
         self.translations.install()
 
@@ -37,9 +35,6 @@ async def set_locale(request):
     lang_code = lang_header.split(",")[0].lower()
     locales_dir = Path(__file__).parent / "translations"
     wrapper.translations = gettext.translation(
-        "messages",
-        localedir=locales_dir,
-        languages=[lang_code],
-        fallback=True
+        "messages", localedir=locales_dir, languages=[lang_code], fallback=True
     )
     wrapper.translations.install()

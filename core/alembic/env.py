@@ -1,11 +1,12 @@
 import os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from pathlib import Path
+
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
 from core.database import Base
-from pathlib import Path
-from dotenv import load_dotenv
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +26,9 @@ if ENV_PATH.exists():
     load_dotenv(ENV_PATH)
 else:
     # Log or handle that the .env file is missing, but proceed with global env variables
-    print(f"Warning: .env file not found. Falling back to global environment variables.")
+    print(
+        f"Warning: .env file not found. Falling back to global environment variables."
+    )
 
 # Get the database URL from environment variables
 SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
@@ -43,6 +46,7 @@ else:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from models import *
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -91,7 +95,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
             # render_as_batch=True
         )
 

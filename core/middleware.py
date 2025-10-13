@@ -1,6 +1,8 @@
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+
 from i18n import set_locale
+
 
 class LanguageMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

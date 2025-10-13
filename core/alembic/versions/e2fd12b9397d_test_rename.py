@@ -5,15 +5,16 @@ Revises: eec980b8ceec
 Create Date: 2025-10-12 11:13:27.144210
 
 """
+
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'e2fd12b9397d'
-down_revision: Union[str, Sequence[str], None] = 'eec980b8ceec'
+revision: str = "e2fd12b9397d"
+down_revision: Union[str, Sequence[str], None] = "eec980b8ceec"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
