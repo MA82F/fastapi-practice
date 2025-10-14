@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from auth.jwt_cookie_auth import (
@@ -12,6 +13,7 @@ from auth.jwt_cookie_auth import (
     validate_refresh_token_from_cookie,
 )
 from core.database import get_db
+from custom_class_exceptions import CostNotFoundException, cost_not_found_exception_handler
 from i18n import _
 from middleware import LanguageMiddleware
 from models import CostModel, UserModel
@@ -26,6 +28,9 @@ from schemas import (
 app = FastAPI()
 
 app.add_middleware(LanguageMiddleware)
+
+# Register handler
+app.add_exception_handler(CostNotFoundException, cost_not_found_exception_handler)
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
@@ -68,10 +73,11 @@ def read_cost(
 ):
     cost = db.query(CostModel).filter(CostModel.id == cost_id).first()
     if not cost:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=_(f"Cost with id {cost_id} not found"),
-        )
+        raise CostNotFoundException(cost_id)
+        # raise HTTPException(
+        #     status_code=status.HTTP_404_NOT_FOUND,
+        #     detail=_(f"Cost with id {cost_id} not found"),
+        # )
 
     # Check if the cost belongs to the authenticated user
     if cost.user_id != current_user.id:
@@ -257,3 +263,18 @@ def get_current_user(current_user: UserModel = Depends(get_authenticated_user)):
     This endpoint can be used to verify if the user is still authenticated
     """
     return {"id": current_user.id, "user_name": current_user.user_name}
+
+
+
+
+
+# exception handler 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    error_response = {
+        "error": True,
+        "status_code": exc.status_code,
+        "detail": str(exc.detail)
+    
+    }
+    return JSONResponse(status_code=exc.status_code , content=error_response)
