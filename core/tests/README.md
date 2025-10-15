@@ -4,7 +4,7 @@
 
 ## 📂 ساختار فایل‌های تست
 
-```
+```text
 tests/
 ├── conftest.py       # کانفیگ‌ها و fixture های pytest
 ├── test_api.py       # تست‌های API endpoints
@@ -14,9 +14,11 @@ tests/
 ## 🔧 فایل‌های اصلی
 
 ### `conftest.py`
+
 این فایل شامل تمام کانفیگ‌های pytest و fixture های قابل استفاده مجدد است:
 
 **Fixtures موجود:**
+
 - `setup_test_database`: ایجاد و حذف database برای تست‌ها
 - `db_session`: session دیتابیس برای تست‌ها
 - `override_dependencies`: override کردن dependencies در FastAPI
@@ -27,9 +29,11 @@ tests/
 - `sample_cost_data`: داده‌های نمونه برای تست cost
 
 ### `test_api.py`
+
 این فایل شامل تمام تست‌های API endpoints است که به صورت class-based سازماندهی شده‌اند:
 
 **کلاس‌های تست:**
+
 1. `TestRootEndpoint`: تست endpoint اصلی
 2. `TestAuthentication`: تست‌های احراز هویت (signup, login, logout, refresh)
 3. `TestCostCRUD`: تست‌های CRUD برای cost
@@ -39,36 +43,43 @@ tests/
 ## 🚀 اجرای تست‌ها
 
 ### اجرای تمام تست‌ها
+
 ```bash
 pytest
 ```
 
 ### اجرای تست‌های یک کلاس خاص
+
 ```bash
 pytest tests/test_api.py::TestAuthentication
 ```
 
 ### اجرای یک تست خاص
+
 ```bash
 pytest tests/test_api.py::TestAuthentication::test_login_success
 ```
 
 ### اجرای با نمایش print ها
+
 ```bash
 pytest -s
 ```
 
 ### اجرای با coverage
+
 ```bash
 pytest --cov=. --cov-report=html
 ```
 
 ### اجرای تست‌های failed
+
 ```bash
 pytest --lf
 ```
 
 ### اجرای تست‌های با marker خاص
+
 ```bash
 pytest -m auth
 pytest -m crud
@@ -90,6 +101,7 @@ pytest --cov=. --cov-report=html
 ## 🧪 نوشتن تست جدید
 
 ### مثال 1: تست ساده
+
 ```python
 def test_example(client):
     response = client.get("/")
@@ -97,6 +109,7 @@ def test_example(client):
 ```
 
 ### مثال 2: تست با authentication
+
 ```python
 def test_protected_endpoint(authenticated_client):
     response = authenticated_client.get("/costs")
@@ -104,6 +117,7 @@ def test_protected_endpoint(authenticated_client):
 ```
 
 ### مثال 3: تست با داده‌های دیتابیس
+
 ```python
 def test_with_db(db_session, test_user):
     assert test_user.id is not None
@@ -120,6 +134,7 @@ def test_with_db(db_session, test_user):
 ## 🐛 دیباگ تست‌ها
 
 ### استفاده از breakpoint
+
 ```python
 def test_example(client):
     import pdb; pdb.set_trace()  # یا breakpoint()
@@ -128,11 +143,13 @@ def test_example(client):
 ```
 
 ### نمایش output
+
 ```bash
 pytest -s -v
 ```
 
 ### اجرای با پرینت جزئیات
+
 ```bash
 pytest --tb=long -vv
 ```
@@ -140,6 +157,7 @@ pytest --tb=long -vv
 ## 📈 بهبود تست‌ها
 
 چیزهایی که می‌توان اضافه کرد:
+
 - [ ] تست‌های performance
 - [ ] تست‌های concurrent requests
 - [ ] تست‌های rate limiting

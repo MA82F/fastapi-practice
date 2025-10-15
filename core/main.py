@@ -13,6 +13,7 @@ from auth.jwt_cookie_auth import (
     validate_refresh_token_from_cookie,
 )
 from core.database import get_db
+from core.config import settings
 from custom_class_exceptions import CostNotFoundException, cost_not_found_exception_handler
 from i18n import _
 from middleware import LanguageMiddleware
@@ -25,12 +26,24 @@ from schemas import (
     UserSchema,
 )
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+
+from redis import asyncio as aioredis
+
+
 app = FastAPI()
 
 app.add_middleware(LanguageMiddleware)
 
 # Register handler
 app.add_exception_handler(CostNotFoundException, cost_not_found_exception_handler)
+
+# Initialize Redis cache
+redis = aioredis.from_url(settings.REDIS_URL)
+cache_backend = RedisBackend(redis)
+FastAPICache.init(cache_backend, prefix="fastapi-cache")
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
@@ -66,6 +79,7 @@ def create_cost(
     response_model=CostResponseSchema,
     status_code=status.HTTP_200_OK,
 )
+@cache(expire=10)
 def read_cost(
     cost_id: int,
     current_user: UserModel = Depends(get_authenticated_user),
@@ -92,6 +106,7 @@ def read_cost(
 @app.get(
     "/costs", response_model=List[CostResponseSchema], status_code=status.HTTP_200_OK
 )
+@cache(expire=10)
 def read_costs(
     current_user: UserModel = Depends(get_authenticated_user),
     db: Session = Depends(get_db),

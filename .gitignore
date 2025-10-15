@@ -181,3 +181,5 @@ cython_debug/
 .cursorindexingignore
 
 core/sqlite.db
+
+postgres/data
