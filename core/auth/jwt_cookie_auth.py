@@ -13,6 +13,9 @@ from models import UserModel
 
 security = HTTPBearer(auto_error=False)  # Don't auto error to allow cookie fallback
 
+# If you are in production set secure_bool to true but in dev set it to false
+secure_bool = False
+
 
 def set_secure_cookies(response: Response, access_token: str, refresh_token: str):
     """Set secure HTTP-only cookies for tokens"""
@@ -22,7 +25,7 @@ def set_secure_cookies(response: Response, access_token: str, refresh_token: str
         value=access_token,
         max_age=60 * 5,  # 5 minutes
         httponly=True,  # Prevent XSS attacks
-        secure=True,  # Only send over HTTPS in production
+        secure=secure_bool,  # Only send over HTTPS in production
         samesite="lax",  # CSRF protection
     )
 
@@ -32,7 +35,7 @@ def set_secure_cookies(response: Response, access_token: str, refresh_token: str
         value=refresh_token,
         max_age=60 * 60 * 24,  # 24 hours
         httponly=True,  # Prevent XSS attacks
-        secure=True,  # Only send over HTTPS in production
+        secure=secure_bool,  # Only send over HTTPS in production
         samesite="lax",  # CSRF protection
     )
 
