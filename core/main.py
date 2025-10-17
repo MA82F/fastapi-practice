@@ -32,6 +32,15 @@ from fastapi_cache.decorator import cache
 
 from redis import asyncio as aioredis
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+)
+
 
 app = FastAPI()
 
@@ -279,7 +288,9 @@ def get_current_user(current_user: UserModel = Depends(get_authenticated_user)):
     """
     return {"id": current_user.id, "user_name": current_user.user_name}
 
-
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
 
 
 
