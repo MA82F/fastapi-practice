@@ -29,8 +29,9 @@ RUN apk add --no-cache \
     netcat-openbsd \
     libpq-dev
 
-# فقط مسیر درست رو کپی کن
+# کپی پکیج‌ها و ابزارهای اجرایی از builder
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/src/core .
 
 COPY ./entrypoint.sh /usr/src/core/entrypoint.sh
