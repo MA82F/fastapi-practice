@@ -16,7 +16,9 @@ set -e
 # echo "✅ redis"
 
 echo "Running migrations..."
-alembic upgrade heads || echo "Alembic skipped"
+alembic upgrade heads
 
 echo "starting fastapi app..."
 exec fastapi run --host 0.0.0.0 --port 80
+
+
