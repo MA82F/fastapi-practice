@@ -1,21 +1,44 @@
+# ---------- Stage 1: Builder ----------
+FROM python:3.12-alpine AS builder
 
-FROM python:3.12-slim
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /usr/src/core
 
+# Install build dependencies (only in builder)
+RUN apk add --no-cache \
+    build-base \
+    libpq-dev
+
+# Copy and install Python dependencies
 COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt --target=/usr/src/core/deps
 
-# RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
-
-# using mirror:
-RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
-
+# Copy source code
 COPY ./core .
 
-# CMD ["fastapi", "run","--host","0.0.0.0","--port","80"]
+# ---------- Stage 2: Runtime ----------
+FROM python:3.12-alpine AS runtime
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /usr/src/core
+
+# Install only runtime system deps (no compiler!)
+RUN apk add --no-cache \
+    bash \
+    netcat-openbsd
+
+# Copy installed dependencies and code from builder stage
+COPY --from=builder /usr/src/core/deps /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/src/core .
+
+# Copy entrypoint
 COPY ./entrypoint.sh /usr/src/core/entrypoint.sh
 RUN chmod +x /usr/src/core/entrypoint.sh
 
-ENTRYPOINT ["/usr/src/core/entrypoint.sh"]
 EXPOSE 80
+ENTRYPOINT ["/usr/src/core/entrypoint.sh"]

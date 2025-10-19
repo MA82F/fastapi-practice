@@ -1,0 +1,4 @@
+briefly we can say: single-stage build we are keeping the tools which are used to build image remain inside the final image. but in multi-stage we build it with a base image and after that in the next steps we just copy what we need, so the build tools are not included anymore.
+
+another reason considered is about security: multi-stage is better
+building time: multi-stage take longer
