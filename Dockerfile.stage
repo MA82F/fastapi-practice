@@ -27,10 +27,9 @@ WORKDIR /usr/src/core
 RUN apk add --no-cache \
     bash \
     netcat-openbsd \
-    libpq-dev  # چون alembic ممکنه به PostgreSQL نیاز داشته باشه
+    libpq-dev
 
-# فقط پکیج‌های نصب‌شده و کد رو کپی کن
-COPY --from=builder /usr/lib/python3.12/site-packages /usr/lib/python3.12/site-packages
+# فقط مسیر درست رو کپی کن
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/src/core .
 
