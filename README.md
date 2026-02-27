@@ -1,4 +1,4 @@
-# fastapi temp
+# fastapi practice
 
 This is a simple FastAPI(backend framework) app called as "Cost-Manager" which I built as part of my practice.
 
